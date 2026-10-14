@@ -1,0 +1,7 @@
+{
+  "EFFECT-ROLL-DURATION.ModeRolls": "Rolls",
+  "EFFECT-ROLL-DURATION.Remaining": "Remaining Rolls",
+  "EFFECT-ROLL-DURATION.RemainingHint": "Counts down by 1 per roll. The effect is deleted at 0.",
+  "EFFECT-ROLL-DURATION.Settings.Debug": "Effect Roll Duration: Debug logging",
+  "EFFECT-ROLL-DURATION.Settings.DebugHint": "Log every step to the browser console ([erd] prefix) and keep a log you can export. Per user: enable it for the GM and for each player you test with."
+}

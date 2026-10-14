@@ -1,0 +1,8 @@
+/* Injected "Remaining Rolls" field in the Active Effect config sheet. */
+.erd-remaining[hidden] {
+  display: none;
+}
+
+.erd-remaining input[type="number"] {
+  max-width: 6rem;
+}
