@@ -31,6 +31,13 @@ Every behavior in [scripts/main.js](scripts/main.js) maps to at least one test. 
 
 **What this cannot prove.** Manual runs show the behavior in your setup (one dnd5e/Foundry version, a few clients). They cannot prove freedom from rare races (two GMs connected, a GM disconnecting mid-roll) or other modules interfering. T14 and T12 probe the likeliest of these. Re-run the full list after any Foundry or dnd5e update.
 
+## Version coverage
+
+The module supports Foundry v14 with dnd5e 5.3.3+ or 6.x. Run the whole plan on each dnd5e version you care about. The tests that differ:
+- **T4-2 (death save).** dnd5e 6.x is recognised by `messageType: "death"` from `message.system.type`. dnd5e 5.x relies on `message.flags.dnd5e.roll.type`, which comes from the source and is untested: check the `hook:ignored` entry shows `messageType: "death"`.
+- **Hooks.** The hook names are identical in 5.3.3 and 6.x (read from both sources), but confirm each T3 roll type still logs `hook:fired` on the 5.x install.
+- **T1 (sheet).** The duration units select is core Foundry v14, so it should match on both. Confirm `sheet:injected` appears.
+
 ## Setup
 
 1. Install the module. Link this folder into Foundry's data folder (adjust the path to your install; this does not copy files, so edits show after a reload):

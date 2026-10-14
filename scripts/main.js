@@ -140,11 +140,6 @@ Hooks.on("renderActiveEffectConfig", (app, html) => {
   const remaining = effect.getFlag(MODULE_ID, "remainingRolls") ?? 1;
   const t = key => game.i18n.localize(`EFFECT-ROLL-DURATION.${key}`);
 
-  const select = root.querySelector('select[name="duration.units"]');
-  if (!select) {
-    return console.warn(`${MODULE_ID} | duration units select not found; Rolls option not added.`);
-  }
-
   const group = document.createElement("div");
   group.classList.add("form-group", "erd-remaining");
   group.hidden = !isRolls;
@@ -164,25 +159,30 @@ Hooks.on("renderActiveEffectConfig", (app, html) => {
     countInput.value = Math.max(1, Math.round(Number(countInput.value) || 1));
   });
 
-  const coreName = select.name;
-  const option = new Option(t("ModeRolls"), MODE_ROLLS);
-  select.append(option);
-  select.closest(".form-group").after(group);
+  const select = root.querySelector('select[name="duration.units"]');
+  if (select) {
+    const coreName = select.name;
+    const option = new Option(t("ModeRolls"), MODE_ROLLS);
+    select.append(option);
+    select.closest(".form-group").after(group);
 
-  const sync = () => {
-    const rolls = select.value === MODE_ROLLS;
-    group.hidden = !rolls;
-    modeInput.value = rolls ? MODE_ROLLS : "none";
-    if (rolls) select.removeAttribute("name");
-    else select.name = coreName;
-    log("sheet:units-changed", { value: select.value, selectHasName: select.hasAttribute("name"), mode: modeInput.value });
-  };
-  select.addEventListener("change", sync);
-  if (isRolls) {
-    option.selected = true;
-    sync();
+    const sync = () => {
+      const rolls = select.value === MODE_ROLLS;
+      group.hidden = !rolls;
+      modeInput.value = rolls ? MODE_ROLLS : "none";
+      if (rolls) select.removeAttribute("name");
+      else select.name = coreName;
+      log("sheet:units-changed", { value: select.value, selectHasName: select.hasAttribute("name"), mode: modeInput.value });
+    };
+    select.addEventListener("change", sync);
+    if (isRolls) {
+      option.selected = true;
+      sync();
+    }
+    log("sheet:injected", { coreName, isRolls, remaining });
+    return;
   }
-  log("sheet:injected", { coreName, isRolls, remaining });
+  console.warn(`${MODULE_ID} | duration units select not found; Rolls option not added.`);
 });
 
 /* -------------------------------------------- */
@@ -190,8 +190,8 @@ Hooks.on("renderActiveEffectConfig", (app, html) => {
 /* -------------------------------------------- */
 
 /**
- * dnd5e roll hooks (verified against dnd5e 6.0.6). Each fires once per roll action, only
- * on the client that made the roll. Initiative and death saves are intentionally absent.
+ * dnd5e roll hooks (verified against dnd5e 5.3.3 and 6.0.6; names and
+ * arguments match). Each fires once per roll action, only on the client that made the roll. Initiative and death saves are intentionally absent.
  * Concentration is a saving throw internally, so rollSavingThrow already covers it;
  * do not also listen to dnd5e.rollConcentration or it would count twice.
  * Only the non-"V2" names are used, since dnd5e fires both for the same roll.
@@ -206,14 +206,16 @@ for (const name of ["rollAbilityCheck", "rollSkill", "rollToolCheck"]) {
 
 /**
  * Death saves are made through the saving throw function, so they fire this hook too
- * (observed in testing). The reliable marker is system.type "death" on the roll's chat
- * message (confirmed in testing); options.saveType was undefined there, but is kept as a
- * harmless extra check. If a roll is made with no chat message, a death save cannot be
- * recognised and would be counted.
+ * (observed in testing on dnd5e 6). The marker is on the roll's chat message:
+ *   dnd5e 6.x: message.system.type === "death"   (confirmed in testing)
+ *   dnd5e 5.x: message.flags.dnd5e.roll.type === "death"   (from source, not yet tested)
+ * options.saveType was undefined in testing; kept as a harmless extra check. If a roll is
+ * made with no chat message, a death save cannot be recognised and would be counted.
  */
 Hooks.on("dnd5e.rollSavingThrow", (rolls, data) => {
   const saveType = rolls?.[0]?.options?.saveType;
-  const messageType = rolls?.[0]?.parent?.system?.type;
+  const parent = rolls?.[0]?.parent;
+  const messageType = parent?.system?.type ?? parent?.flags?.dnd5e?.roll?.type;
   if (saveType === "death" || messageType === "death") {
     return log("hook:ignored", { hook: "rollSavingThrow", reason: "death save", saveType, messageType });
   }

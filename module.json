@@ -2,12 +2,12 @@
   "id": "effect-roll-duration",
   "title": "Effect Roll Duration",
   "description": "Adds a \"Rolls\" duration to Active Effects: the effect is removed after its actor makes a set number of d20 rolls (attacks, saves, ability/skill checks).",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "url": "https://github.com/Bushnov/EffectRollDurationModule",
   "manifest": "https://github.com/Bushnov/EffectRollDurationModule/releases/latest/download/module.json",
-  "download": "https://github.com/Bushnov/EffectRollDurationModule/releases/download/v0.1.0/module.zip",
+  "download": "https://github.com/Bushnov/EffectRollDurationModule/releases/download/v0.1.1/module.zip",
   "compatibility": {
-    "minimum": "14.367",
+    "minimum": "14",
     "verified": "14"
   },
   "authors": [
@@ -35,7 +35,7 @@
         "id": "dnd5e",
         "type": "system",
         "compatibility": {
-          "minimum": "6.0.0"
+          "minimum": "5.3.3"
         }
       }
     ]

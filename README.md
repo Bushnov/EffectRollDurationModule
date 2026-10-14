@@ -1,8 +1,8 @@
 # Effect Roll Duration
 
-A small Foundry VTT module for the D&D 5e system. It adds a **Rolls** option to the Active Effect duration dropdown: the effect is deleted after its actor makes a set number of d20 rolls.
+A small Foundry VTT module for the D&D 5e system. It adds a **Rolls** duration to Active Effects: the effect is deleted after its actor makes a set number of d20 rolls.
 
-Requires Foundry v14.367 or later and dnd5e 6.0.0 or later.
+Requires Foundry v14 and dnd5e 5.3.3 or later (5.x or 6.x).
 
 ## Use
 
