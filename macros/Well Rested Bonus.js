@@ -68,6 +68,9 @@ const effectData = {
   }
 };
 
+// Player characters = "character" actors that a player owns. Utility actors that are owned
+// by a player but never roll (for example a camera or a party bank) also match; the effect
+// is harmless on them.
 const playerActors = game.actors.filter(a => a.hasPlayerOwner && a.type === "character");
 if (!playerActors.length) {
   ui.notifications.warn("No player-controlled characters found.");
@@ -75,10 +78,20 @@ if (!playerActors.length) {
 }
 
 let appliedCount = 0;
+let replacedCount = 0;
 for (const actor of playerActors) {
-  // Skip anyone who already has a Well Rested Bonus so they don't stack.
-  if (actor.effects.some(e => e.name.startsWith("Well Rested Bonus"))) continue;
+  // Replace any existing Well Rested Bonus (unused, or a different die) so they never stack.
+  const old = actor.effects.filter(e => e.name.startsWith("Well Rested Bonus")).map(e => e.id);
+  if (old.length) {
+    await actor.deleteEmbeddedDocuments("ActiveEffect", old);
+    replacedCount++;
+  }
   await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
   appliedCount++;
 }
-ui.notifications.info(`Applied a +${chosenDie} well-rested buff to ${appliedCount} player characters.`);
+console.log("Well Rested Bonus applied to:", playerActors.map(a => a.name));
+ui.notifications.info(
+  `Applied a +${chosenDie} well-rested buff to ${appliedCount} characters`
+  + (replacedCount ? ` (replaced an existing one on ${replacedCount})` : "")
+  + `: ${playerActors.map(a => a.name).join(", ")}.`
+);
